@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NoMiss Admin Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a2634;
+    --bg2: #243447;
+    --bg3: #2d3f55;
+    --accent: #4ecdc4;
+    --accent2: #ffd166;
+    --accent3: #ff6b6b;
+    --accent4: #a8e6cf;
+    --text: #e8f4f8;
+    --text2: #8fb3c9;
+    --border: #3a5068;
+    --card: #1e2f42;
+    --success: #06d6a0;
+    --danger: #ff6b6b;
+    --warn: #ffd166;
+    --pixel: 2px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse at 20% 50%, rgba(78,205,196,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(255,209,102,0.05) 0%, transparent 60%);
+  }
+
+  /* ── Pixel border utility ── */
+  .pixel-border {
+    border: var(--pixel) solid var(--border);
+    box-shadow: var(--pixel) var(--pixel) 0 rgba(0,0,0,0.4),
+                inset 0 0 0 var(--pixel) rgba(255,255,255,0.03);
+  }
+
+  /* ── LOGIN SCREEN ── */
+  #loginScreen {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 20px;
+  }
+
+  .login-box {
+    background: var(--card);
+    border: var(--pixel) solid var(--accent);
+    box-shadow: 4px 4px 0 var(--accent), 8px 8px 0 rgba(78,205,196,0.2);
+    padding: 40px;
+    width: 100%; max-width: 420px;
+    position: relative;
+  }
+
+  .login-box::before {
+    content: '';
+    position: absolute; top: -1px; left: 10px;
+    width: 60%; height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+
+  .logo-text {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 24px;
+    color: var(--accent2);
+    text-align: center;
+    margin-bottom: 4px;
+    text-shadow: 3px 3px 0 rgba(0,0,0,0.5);
+  }
+
+  .logo-sub {
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+    color: var(--text2);
+    text-align: center;
+    margin-bottom: 32px;
+    letter-spacing: 2px;
+  }
+
+  .field-group { margin-bottom: 20px; }
+
+  .field-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    display: block;
+    letter-spacing: 1px;
+  }
+
+  .field-input {
+    width: 100%;
+    background: var(--bg2);
+    border: var(--pixel) solid var(--border);
+    color: var(--text);
+    padding: 12px 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .field-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(78,205,196,0.2); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 20px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    border: var(--pixel) solid;
+    cursor: pointer;
+    transition: all 0.1s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    outline: none;
+  }
+
+  .btn:active { transform: translate(2px, 2px); box-shadow: none !important; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.4);
+    width: 100%;
+  }
+
+  .btn-primary:hover { background: #3dbdb5; }
+
+  .btn-success { background: var(--success); color: var(--bg); border-color: var(--success); box-shadow: 3px 3px 0 rgba(0,0,0,0.4); }
+  .btn-danger  { background: transparent; color: var(--danger); border-color: var(--danger); box-shadow: 3px 3px 0 rgba(0,0,0,0.3); }
+  .btn-warn    { background: var(--warn); color: var(--bg); border-color: var(--warn); box-shadow: 3px 3px 0 rgba(0,0,0,0.4); }
+  .btn-ghost   { background: transparent; color: var(--text2); border-color: var(--border); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm { padding: 6px 12px; font-size: 7px; }
+
+  /* ── MAIN APP ── */
+  #appScreen { display: none; min-height: 100vh; flex-direction: column; }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--card);
+    border-bottom: var(--pixel) solid var(--border);
+    padding: 0 24px;
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+
+  .header-logo {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .header-logo span { color: var(--text2); font-size: 9px; }
+
+  .header-right { display: flex; align-items: center; gap: 16px; }
+
+  .admin-badge {
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    padding: 4px 8px;
+    border: var(--pixel) solid rgba(0,0,0,0.3);
+  }
+
+  .logout-btn {
+    background: transparent;
+    border: var(--pixel) solid var(--border);
+    color: var(--text2);
+    padding: 6px 12px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+  /* ── LAYOUT ── */
+  .app-body { display: flex; flex: 1; }
+
+  .sidebar {
+    width: 200px; min-width: 200px;
+    background: var(--card);
+    border-right: var(--pixel) solid var(--border);
+    padding: 20px 0;
+  }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 20px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+    line-height: 1.6;
+  }
+
+  .nav-item:hover { color: var(--text); background: rgba(78,205,196,0.05); }
+  .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(78,205,196,0.08); }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+  .main-content { flex: 1; padding: 28px; overflow-y: auto; }
+
+  /* ── STATS ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 28px; }
+
+  .stat-card {
+    background: var(--card);
+    border: var(--pixel) solid var(--border);
+    padding: 20px;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+    position: relative; overflow: hidden;
+  }
+
+  .stat-card::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .stat-card.c1::after { background: var(--accent); }
+  .stat-card.c2::after { background: var(--accent2); }
+  .stat-card.c3::after { background: var(--accent3); }
+  .stat-card.c4::after { background: var(--accent4); }
+
+  .stat-num {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 28px;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-family: 'VT323', monospace;
+    font-size: 16px;
+    color: var(--text2);
+    letter-spacing: 1px;
+  }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .section-title::before {
+    content: '▶';
+    color: var(--accent);
+    font-size: 9px;
+  }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    display: flex; gap: 12px; align-items: center;
+    margin-bottom: 20px; flex-wrap: wrap;
+  }
+
+  .filter-select {
+    background: var(--bg2);
+    border: var(--pixel) solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .filter-select:focus { border-color: var(--accent); }
+
+  .search-input {
+    background: var(--bg2);
+    border: var(--pixel) solid var(--border);
+    color: var(--text);
+    padding: 8px 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    outline: none;
+    flex: 1; min-width: 200px;
+  }
+
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text2); }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    background: var(--card);
+    border: var(--pixel) solid var(--border);
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+    overflow-x: auto;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead { background: var(--bg2); }
+
+  th {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    color: var(--accent);
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: var(--pixel) solid var(--border);
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 13px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    vertical-align: middle;
+  }
+
+  tr:hover td { background: rgba(78,205,196,0.04); }
+  tr:last-child td { border-bottom: none; }
+
+  .role-badge {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 6px;
+    padding: 3px 7px;
+    border: 1px solid;
+    display: inline-block;
+  }
+
+  .role-student { color: var(--accent); border-color: var(--accent); background: rgba(78,205,196,0.1); }
+  .role-teacher { color: var(--accent2); border-color: var(--accent2); background: rgba(255,209,102,0.1); }
+
+  .action-btns { display: flex; gap: 8px; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--card);
+    border: var(--pixel) solid var(--accent);
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.5);
+    width: 100%; max-width: 520px;
+    max-height: 90vh; overflow-y: auto;
+    animation: slideIn 0.2s ease;
+  }
+
+  @keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-header {
+    padding: 20px 24px;
+    border-bottom: var(--pixel) solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg2);
+  }
+
+  .modal-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: var(--accent2);
+  }
+
+  .modal-close {
+    background: none; border: none; color: var(--text2);
+    font-size: 20px; cursor: pointer; padding: 0 4px;
+    font-family: 'Press Start 2P', monospace;
+  }
+
+  .modal-close:hover { color: var(--danger); }
+  .modal-body { padding: 24px; }
+  .modal-footer { padding: 16px 24px; border-top: var(--pixel) solid var(--border); display: flex; gap: 12px; justify-content: flex-end; }
+
+  /* ── FORM GRID ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-grid .full { grid-column: 1 / -1; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--bg2);
+    border: var(--pixel) solid var(--success);
+    color: var(--text);
+    padding: 14px 20px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.4);
+    z-index: 9999;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.3s;
+    max-width: 300px; line-height: 1.8;
+  }
+
+  #toast.show { transform: translateY(0); opacity: 1; }
+  #toast.error { border-color: var(--danger); }
+
+  /* ── LOADING ── */
+  .loading {
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px; color: var(--text2);
+    font-family: 'Press Start 2P', monospace; font-size: 9px;
+    gap: 12px;
+  }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-state {
+    text-align: center; padding: 48px 20px;
+    color: var(--text2);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px; line-height: 2.5;
+  }
+
+  .empty-state .empty-icon { font-size: 40px; margin-bottom: 16px; }
+
+  /* ── PAGE VISIBILITY ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── CONFIRM DIALOG ── */
+  .confirm-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 2000;
+    align-items: center; justify-content: center;
+  }
+  .confirm-overlay.open { display: flex; }
+  .confirm-box {
+    background: var(--card);
+    border: var(--pixel) solid var(--danger);
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.5);
+    padding: 32px;
+    max-width: 360px; width: 90%;
+    text-align: center;
+  }
+  .confirm-title { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--danger); margin-bottom: 16px; }
+  .confirm-msg { font-size: 15px; color: var(--text2); margin-bottom: 24px; line-height: 1.6; }
+  .confirm-btns { display: flex; gap: 12px; justify-content: center; }
+
+  @media (max-width: 600px) {
+    .sidebar { display: none; }
+    .form-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="logo-text">NOMISS</div>
+    <div class="logo-sub">// ADMIN PORTAL</div>
+
+    <div class="field-group">
+      <label class="field-label">USERNAME</label>
+      <input type="text" class="field-input" id="loginUser" placeholder="admin" />
+    </div>
+    <div class="field-group">
+      <label class="field-label">PASSWORD</label>
+      <input type="password" class="field-input" id="loginPass" placeholder="••••••••" />
+    </div>
+    <button class="btn btn-primary" onclick="doLogin()">▶ LOGIN</button>
+    <div id="loginError" style="color:var(--danger);font-family:'Press Start 2P',monospace;font-size:7px;margin-top:12px;text-align:center;display:none;">
+      INVALID CREDENTIALS
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ APP ══════════ -->
+<div id="appScreen">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-logo">
+      NOMISS <span>// ADMIN</span>
+    </div>
+    <div class="header-right">
+      <span class="admin-badge">ADMIN</span>
+      <button class="logout-btn" onclick="doLogout()">LOGOUT ✕</button>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+        <span class="nav-icon">🏠</span> DASHBOARD
+      </div>
+      <div class="nav-item" onclick="showPage('students')" id="nav-students">
+        <span class="nav-icon">👥</span> STUDENTS
+      </div>
+      <div class="nav-item" onclick="showPage('teachers')" id="nav-teachers">
+        <span class="nav-icon">🎓</span> TEACHERS
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main-content">
+
+      <!-- DASHBOARD PAGE -->
+      <div class="page active" id="page-dashboard">
+        <div class="section-header">
+          <div class="section-title">OVERVIEW</div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card c1">
+            <div class="stat-num" id="stat-students">—</div>
+            <div class="stat-label">STUDENTS</div>
+          </div>
+          <div class="stat-card c2">
+            <div class="stat-num" id="stat-teachers">—</div>
+            <div class="stat-label">TEACHERS</div>
+          </div>
+          <div class="stat-card c3">
+            <div class="stat-num" id="stat-sections">—</div>
+            <div class="stat-label">SECTIONS</div>
+          </div>
+          <div class="stat-card c4">
+            <div class="stat-num" id="stat-total">—</div>
+            <div class="stat-label">TOTAL USERS</div>
+          </div>
+        </div>
+        <div class="section-header">
+          <div class="section-title">RECENT STUDENTS</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>NAME</th><th>EMAIL</th><th>SECTION</th><th>REGISTERED</th>
+              </tr>
+            </thead>
+            <tbody id="recentTable">
+              <tr><td colspan="5"><div class="loading"><div class="spinner"></div> LOADING...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- STUDENTS PAGE -->
+      <div class="page" id="page-students">
+        <div class="section-header">
+          <div class="section-title">STUDENTS</div>
+          <button class="btn btn-success btn-sm" onclick="openAddModal('student')">＋ ADD STUDENT</button>
+        </div>
+        <div class="filter-bar">
+          <input class="search-input" id="studentSearch" placeholder="Search name or email..." oninput="filterTable()" />
+          <select class="filter-select" id="sectionFilter" onchange="filterTable()">
+            <option value="">ALL SECTIONS</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>NAME</th><th>EMAIL</th><th>PHONE</th><th>SECTION</th><th>REGISTERED</th><th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="studentsTable">
+              <tr><td colspan="7"><div class="loading"><div class="spinner"></div> LOADING...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TEACHERS PAGE -->
+      <div class="page" id="page-teachers">
+        <div class="section-header">
+          <div class="section-title">TEACHERS</div>
+          <button class="btn btn-success btn-sm" onclick="openAddModal('teacher')">＋ ADD TEACHER</button>
+        </div>
+        <div class="filter-bar">
+          <input class="search-input" id="teacherSearch" placeholder="Search name or email..." oninput="filterTeachers()" />
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>NAME</th><th>EMAIL</th><th>PHONE</th><th>SECTION</th><th>REGISTERED</th><th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="teachersTable">
+              <tr><td colspan="7"><div class="loading"><div class="spinner"></div> LOADING...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ ADD/EDIT MODAL ══════════ -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">ADD STUDENT</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="full">
+          <div class="field-group">
+            <label class="field-label">FULL NAME</label>
+            <input type="text" class="field-input" id="f_fullName" placeholder="Juan Dela Cruz" />
+          </div>
+        </div>
+        <div>
+          <div class="field-group">
+            <label class="field-label">EMAIL</label>
+            <input type="email" class="field-input" id="f_email" placeholder="juan@school.edu.ph" />
+          </div>
+        </div>
+        <div>
+          <div class="field-group">
+            <label class="field-label">PASSWORD</label>
+            <input type="text" class="field-input" id="f_password" placeholder="Default password" />
+          </div>
+        </div>
+        <div>
+          <div class="field-group">
+            <label class="field-label">PHONE / CONTACTS</label>
+            <input type="text" class="field-input" id="f_contacts" placeholder="639XXXXXXXXX" />
+          </div>
+        </div>
+        <div>
+          <div class="field-group">
+            <label class="field-label">GRADE</label>
+            <select class="field-input filter-select" id="f_grade">
+              <option value="11">Grade 11</option>
+              <option value="12" selected>Grade 12</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <div class="field-group">
+            <label class="field-label">STRAND</label>
+            <select class="field-input filter-select" id="f_strand">
+              <option value="STEM">STEM</option>
+              <option value="ABM">ABM</option>
+              <option value="HUMSS">HUMSS</option>
+              <option value="TVL">TVL</option>
+            </select>
+          </div>
+        </div>
+        <div class="full">
+          <div class="field-group">
+            <label class="field-label">SECTION</label>
+            <input type="text" class="field-input" id="f_section" placeholder="1P, 2P, 3P..." />
+          </div>
+        </div>
+        <input type="hidden" id="f_role" value="student" />
+        <input type="hidden" id="f_editEmail" value="" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">CANCEL</button>
+      <button class="btn btn-success btn-sm" id="modalSaveBtn" onclick="saveUser()">▶ SAVE</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ CONFIRM DELETE ══════════ -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-title">⚠ DELETE USER</div>
+    <div class="confirm-msg" id="confirmMsg">Are you sure you want to delete this student?</div>
+    <div class="confirm-btns">
+      <button class="btn btn-ghost btn-sm" onclick="closeConfirm()">CANCEL</button>
+      <button class="btn btn-danger btn-sm" onclick="confirmDelete()">DELETE ✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TOAST ══════════ -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// ✅ CONFIGURATION — UPDATE YOUR APPS SCRIPT URL HERE!
+// ═══════════════════════════════════════
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxT6dlYPvTNLqdUV-tDKrQ9JBjBwJO5Vf6LI5nMdEDaWBZfhRw-iKjKcbI8Zem_EC5xkQ/exec';
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'nomiss2024';
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let allUsers = [];
+let deleteTarget = null;
+let isEditing = false;
+
+// ═══════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════
+function doLogin() {
+  const u = document.getElementById('loginUser').value;
+  const p = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginError');
+  if (u === ADMIN_USER && p === ADMIN_PASS) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appScreen').style.display = 'flex';
+    err.style.display = 'none';
+    loadAllUsers();
+  } else {
+    err.style.display = 'block';
+    setTimeout(() => err.style.display = 'none', 2000);
+  }
+}
+
+function doLogout() {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('appScreen').style.display = 'none';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  if (name === 'students') renderStudents();
+  if (name === 'teachers') renderTeachers();
+}
+
+// ═══════════════════════════════════════
+// LOAD DATA
+// ═══════════════════════════════════════
+async function loadAllUsers() {
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getAllUsers`);
+    const data = await res.json();
+    if (data.success) {
+      allUsers = data.data.users || [];
+      updateStats();
+      renderRecent();
+      renderStudents();
+      renderTeachers();
+      populateSectionFilter();
+    } else {
+      showToast('Failed to load users: ' + data.message, true);
+    }
+  } catch (e) {
+    showToast('Network error loading users', true);
+    console.error(e);
+  }
+}
+
+function updateStats() {
+  const students = allUsers.filter(u => u.role === 'student');
+  const teachers = allUsers.filter(u => u.role === 'teacher');
+  const sections = [...new Set(students.map(u => u.gradeSection))].filter(Boolean);
+  document.getElementById('stat-students').textContent = students.length;
+  document.getElementById('stat-teachers').textContent = teachers.length;
+  document.getElementById('stat-sections').textContent = sections.length;
+  document.getElementById('stat-total').textContent = allUsers.length;
+}
+
+function populateSectionFilter() {
+  const students = allUsers.filter(u => u.role === 'student');
+  const sections = [...new Set(students.map(u => u.gradeSection))].filter(Boolean).sort();
+  const sel = document.getElementById('sectionFilter');
+  sel.innerHTML = '<option value="">ALL SECTIONS</option>';
+  sections.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s; opt.textContent = s;
+    sel.appendChild(opt);
+  });
+}
+
+// ═══════════════════════════════════════
+// RENDER TABLES
+// ═══════════════════════════════════════
+function renderRecent() {
+  const tbody = document.getElementById('recentTable');
+  const recent = [...allUsers].filter(u => u.role === 'student')
+    .sort((a, b) => new Date(b.registeredAt) - new Date(a.registeredAt))
+    .slice(0, 5);
+  if (!recent.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">👥</div>NO STUDENTS YET</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = recent.map(u => `
+    <tr>
+      <td style="font-family:'Press Start 2P',monospace;font-size:8px;color:var(--accent)">${u.userId}</td>
+      <td style="font-weight:700">${u.fullName}</td>
+      <td style="color:var(--text2)">${u.email}</td>
+      <td><span style="background:rgba(78,205,196,0.1);color:var(--accent);padding:2px 8px;font-size:13px">${u.gradeSection || '—'}</span></td>
+      <td style="color:var(--text2);font-size:13px">${formatDate(u.registeredAt)}</td>
+    </tr>
+  `).join('');
+}
+
+function renderStudents() {
+  const search = (document.getElementById('studentSearch')?.value || '').toLowerCase();
+  const section = document.getElementById('sectionFilter')?.value || '';
+  const tbody = document.getElementById('studentsTable');
+  let list = allUsers.filter(u => u.role === 'student');
+  if (search) list = list.filter(u => u.fullName?.toLowerCase().includes(search) || u.email?.toLowerCase().includes(search));
+  if (section) list = list.filter(u => u.gradeSection === section);
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🔍</div>NO STUDENTS FOUND</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(u => `
+    <tr>
+      <td style="font-family:'Press Start 2P',monospace;font-size:8px;color:var(--accent)">${u.userId}</td>
+      <td style="font-weight:700">${u.fullName}</td>
+      <td style="color:var(--text2);font-size:13px">${u.email}</td>
+      <td style="color:var(--text2);font-size:13px">${u.contacts || '—'}</td>
+      <td><span style="background:rgba(78,205,196,0.1);color:var(--accent);padding:2px 8px;font-size:13px">${u.gradeSection || '—'}</span></td>
+      <td style="color:var(--text2);font-size:13px">${formatDate(u.registeredAt)}</td>
+      <td>
+        <div class="action-btns">
+          <button class="btn btn-warn btn-sm" onclick='openEditModal(${JSON.stringify(u)})'>✏ EDIT</button>
+          <button class="btn btn-danger btn-sm" onclick="askDelete('${u.email}','${u.fullName}')">✕ DEL</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderTeachers() {
+  const search = (document.getElementById('teacherSearch')?.value || '').toLowerCase();
+  const tbody = document.getElementById('teachersTable');
+  let list = allUsers.filter(u => u.role === 'teacher');
+  if (search) list = list.filter(u => u.fullName?.toLowerCase().includes(search) || u.email?.toLowerCase().includes(search));
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🎓</div>NO TEACHERS FOUND</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(u => `
+    <tr>
+      <td style="font-family:'Press Start 2P',monospace;font-size:8px;color:var(--accent2)">${u.userId}</td>
+      <td style="font-weight:700">${u.fullName}</td>
+      <td style="color:var(--text2);font-size:13px">${u.email}</td>
+      <td style="color:var(--text2);font-size:13px">${u.contacts || '—'}</td>
+      <td><span style="background:rgba(255,209,102,0.1);color:var(--accent2);padding:2px 8px;font-size:13px">${u.gradeSection || '—'}</span></td>
+      <td style="color:var(--text2);font-size:13px">${formatDate(u.registeredAt)}</td>
+      <td>
+        <div class="action-btns">
+          <button class="btn btn-warn btn-sm" onclick='openEditModal(${JSON.stringify(u)})'>✏ EDIT</button>
+          <button class="btn btn-danger btn-sm" onclick="askDelete('${u.email}','${u.fullName}')">✕ DEL</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterTable() { renderStudents(); }
+function filterTeachers() { renderTeachers(); }
+
+// ═══════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════
+function openAddModal(role) {
+  isEditing = false;
+  document.getElementById('modalTitle').textContent = role === 'student' ? 'ADD STUDENT' : 'ADD TEACHER';
+  document.getElementById('f_role').value = role;
+  document.getElementById('f_editEmail').value = '';
+  document.getElementById('f_fullName').value = '';
+  document.getElementById('f_email').value = '';
+  document.getElementById('f_password').value = 'NoMiss2024';
+  document.getElementById('f_contacts').value = '';
+  document.getElementById('f_grade').value = '12';
+  document.getElementById('f_strand').value = 'STEM';
+  document.getElementById('f_section').value = '';
+  document.getElementById('f_email').disabled = false;
+  document.getElementById('userModal').classList.add('open');
+}
+
+// ✅ CRITICAL FIX: Parse "12-STEM 1P" correctly when editing
+function openEditModal(user) {
+  isEditing = true;
+  
+  // ✅ Parse Grade_Section_Strand: "12-STEM 1P"
+  // Format: grade + "-" + strand + " " + section
+  let grade = '12';
+  let strand = 'STEM';
+  let section = '';
+  
+  if (user.gradeSection) {
+    const parts = user.gradeSection.split('-'); // ["12", "STEM 1P"]
+    if (parts.length >= 2) {
+      grade = parts[0]; // "12"
+      const strandSection = parts[1].trim(); // "STEM 1P"
+      const spaceIndex = strandSection.indexOf(' '); // Find first space
+      
+      if (spaceIndex !== -1) {
+        strand = strandSection.substring(0, spaceIndex); // "STEM"
+        section = strandSection.substring(spaceIndex + 1); // "1P"
+      } else {
+        strand = strandSection; // No section, just strand
+      }
+    }
+  }
+
+  document.getElementById('modalTitle').textContent = 'EDIT USER';
+  document.getElementById('f_role').value = user.role;
+  document.getElementById('f_editEmail').value = user.email;
+  document.getElementById('f_fullName').value = user.fullName || '';
+  document.getElementById('f_email').value = user.email || '';
+  document.getElementById('f_password').value = user.password || '';
+  document.getElementById('f_contacts').value = user.contacts || '';
+  document.getElementById('f_grade').value = grade;
+  document.getElementById('f_strand').value = strand;
+  document.getElementById('f_section').value = section;
+  document.getElementById('f_email').disabled = true;
+  document.getElementById('userModal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('userModal').classList.remove('open'); }
+
+// ✅ CRITICAL FIX: Send grade, strand, section separately (Apps Script combines them)
+async function saveUser() {
+  const fullName = document.getElementById('f_fullName').value.trim();
+  const email = document.getElementById('f_email').value.trim();
+  const password = document.getElementById('f_password').value.trim();
+  const contacts = document.getElementById('f_contacts').value.trim();
+  const grade = document.getElementById('f_grade').value;
+  const strand = document.getElementById('f_strand').value;
+  const section = document.getElementById('f_section').value.trim();
+  const role = document.getElementById('f_role').value;
+  const editEmail = document.getElementById('f_editEmail').value;
+
+  if (!fullName || !email || !password) { 
+    showToast('Please fill all required fields', true); 
+    return; 
+  }
+
+  const btn = document.getElementById('modalSaveBtn');
+  btn.textContent = '...SAVING';
+  btn.disabled = true;
+
+  const action = isEditing ? 'adminEditUser' : 'registerUser';
+  
+  // ✅ Send grade, strand, section SEPARATELY
+  // Apps Script will combine as: grade + '-' + strand + ' ' + section
+  const params = new URLSearchParams({
+    action: action,
+    email: email,
+    password: password,
+    fullName: fullName,
+    contacts: contacts,
+    role: role,
+    grade: grade,
+    strand: strand,
+    section: section
+  });
+  
+  if (isEditing) {
+    params.append('editEmail', editEmail);
+  }
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?${params.toString()}`);
+    const data = await res.json();
+    if (data.success) {
+      showToast(isEditing ? 'User updated!' : 'User added!');
+      closeModal();
+      await loadAllUsers();
+    } else {
+      showToast(data.message || 'Failed to save', true);
+    }
+  } catch (e) {
+    showToast('Network error', true);
+    console.error(e);
+  }
+
+  btn.textContent = '▶ SAVE';
+  btn.disabled = false;
+}
+
+// ═══════════════════════════════════════
+// DELETE
+// ═══════════════════════════════════════
+function askDelete(email, name) {
+  deleteTarget = email;
+  document.getElementById('confirmMsg').textContent = `Delete "${name}"? This cannot be undone.`;
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('open');
+  deleteTarget = null;
+}
+
+async function confirmDelete() {
+  if (!deleteTarget) return;
+  closeConfirm();
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=adminDeleteUser&email=${encodeURIComponent(deleteTarget)}`);
+    const data = await res.json();
+    if (data.success) {
+      showToast('User deleted.');
+      await loadAllUsers();
+    } else {
+      showToast(data.message || 'Delete failed', true);
+    }
+  } catch (e) {
+    showToast('Network error', true);
+  }
+}
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+let toastTimer;
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (isError ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = '', 3000);
+}
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function formatDate(d) {
+  if (!d) return '—';
+  try {
+    return new Date(d).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch { return d; }
+}
+</script>
+</body>
+</html>
